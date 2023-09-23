@@ -1,5 +1,7 @@
 package main
 
+import "github.com/gin-gonic/gin"
+
 func main() {
 	var err error
 
@@ -9,5 +11,12 @@ func main() {
 
 	initLogger(conf.logLevel.String())
 
-	log.Println("Hello base layout")
+	engine := gin.Default()
+
+	engine.Use(authMiddleware())
+	setRoutes(engine)
+
+	if err := engine.Run(conf.serverAddress()); err != nil {
+		log.Fatalf("The web server stopped working unexpectedly: %v", err)
+	}
 }
