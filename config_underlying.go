@@ -39,7 +39,7 @@ func (cp configParameter) String() string {
 	return string(cp)
 }
 
-func setFromEnv(v *configParameter, env string, required bool, warn bool) error {
+func setFromEnv(v *configParameter, env string, def string, required bool, warn bool) error {
 
 	ev, exists := os.LookupEnv(env)
 	if !exists {
@@ -47,11 +47,12 @@ func setFromEnv(v *configParameter, env string, required bool, warn bool) error 
 			return fmt.Errorf("conf error: failed to load required env variable '%s'", env)
 		}
 		if warn {
-			log.Errorf("conf warn: failed to load env variable '%s'", env)
+			*v = configParameter(def)
+			log.Errorf("conf warn: failed to load env variable '%s', default: '%s'", env, def)
 		}
+	} else {
+		*v = configParameter(ev)
 	}
-
-	*v = configParameter(ev)
 
 	return nil
 }
